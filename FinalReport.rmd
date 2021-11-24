@@ -24,6 +24,18 @@ A new  preventative vaccine (covid91) is under test in clinical trials. Given th
 
 # Guys
 
+```{r}
+Guys <- filter(FinalData, sex=="guy")
+```
+
+```{r}
+barchartGC(~infected + treatment,data=Guys)
+barchartGC(~infected + treatment,data=Guys, type="percent")
+
+```
+  
+The data illustrates that the overwhelming majority of the population of Guys were not infected, however the guys who received the treatment, actually were more likely to acquire COVID than the ones who received the placebo.
+  
 # Gals
 
 # LGBTQ
