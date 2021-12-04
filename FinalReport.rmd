@@ -68,6 +68,43 @@ options(digits=3)
   
 # Gals
 
+```{r}
+Gals <- filter(FinalData, sex=="gal")
+```
+
+# Graphical Results
+```{r}
+barchartGC(~infected + treatment,data=Gals)
+barchartGC(~infected + treatment,data=Gals, type="percent")
+```
+
+Our frequency bar chart displays the normality that the large majority of the sample were OK, while a minority contracted COVID. The percent bar chart illustrates that comparatively, there was a discernible difference between the treatment and the placebo. About 30% of the gal population that contracted COVID-19 received the drug while the other 70% of that population received the placebo. This suggests that the study drug Covid91 could be effective for gals because it seemingly decreased the likelihood of contarcting COVID-19. 
+
+# Numerical Results
+```{r}
+table1 <- xtabs(~infected + treatment, data=Gals)
+rowPerc(table1)
+colPerc(table1)
+```
+  
+The first table shows that over 90% of the population were totally fine disregarding drug or placebo. Of those that became infected, 66.9% had received the placebo while only 33.1% of the infected were those that received the drug. Akin to our graphical results, the discrepancy between the two groups indicates a bias in the data.
+  
+# Inferential Results
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+Galmod <- fisher.test(table1)
+galeff <- (Galmod$estimate/(Galmod$estimate+1))*100
+Galeffupper <- Galmod$conf.int[2]
+Galeffuppereff <- (Galmod$conf.int[2]/(Galmod$conf.int[2]+1))*100
+Galefflower <- Galmod$conf.int[1]
+Galefflowereff <- (Galmod$conf.int[1]/(Galmod$conf.int[1]+1))*100
+options(digits=3)
+```
+  
+Our alternative hypothesis is that there is a tangible difference in the probability of contracting COVID-19 dependent on whether a person had taken or not taken the study drug treatment. The null hypothesis is that there is no difference between those that received the  drug Covid91 and those that received a placebo in getting infected with COVID. The Chi-squared  and Fisher tests similarly calculated p-values lower than 0.05, indicating that we can determine the difference significant in our data. The fisher p-value was 2e-16 and the Chi Square p-value 4e-16. The probability of our results being unbiased and naturally occurring is extremely unlikely. The Fisher test calculated that the odds ratio of women contracting COVID-19 when taking the treatment was `r Galmod$estimate` times less than those who received the placebo. As such, we can reject the null hypothesis because women are less likely to get infected with COVID after getting the treatment. The efficacy of the drug for the gals is `r galeff`% with a 95% confidence interval of `r Galefflowereff` to `r Galeffuppereff`. Based on this, I would advise gals to get the treatment.
+  
 # LGBTQ
 
 # Drug Users
