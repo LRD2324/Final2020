@@ -2,9 +2,10 @@
 title: "Covid91 vaccine study Final2021"
 author: "Logan DeHay"
 date: "November 23 2021"
-output: 
-    html_document:
-    toc: true
+output:
+  pdf_document: default
+  toc: yes
+  html_document: null
 ---
 
 ```{r include=FALSE,echo=FALSE}
@@ -16,6 +17,7 @@ OldData <-read.csv(file="covid91.csv",header=TRUE)
 FinalData <- OldData %>% mutate(infected = recode(infected, aids = "covid", none = "OK" )) %>% select(-one_of("X"))
 
 FinalData <- FinalData %>% mutate_if(is.character, as.factor)
+FinalData$treatment <- relevel(FinalData$treatment, ref = "placebo")
 ```
 
 # Introduction
@@ -27,7 +29,7 @@ A new  preventative vaccine (covid91) is under test in clinical trials. Given th
 ```{r}
 Guys <- filter(FinalData, sex=="guy")
 ```
-
+# Graphical Results
 ```{r}
 barchartGC(~infected + treatment,data=Guys)
 barchartGC(~infected + treatment,data=Guys, type="percent")
@@ -35,6 +37,34 @@ barchartGC(~infected + treatment,data=Guys, type="percent")
 ```
   
 The data illustrates that the overwhelming majority of the population of Guys were not infected, however the guys who received the treatment, actually were more likely to acquire COVID than the ones who received the placebo.
+  
+# Numerical Results
+```{r}
+
+table1 <- xtabs(~infected + treatment, data=Guys)
+rowPerc(table1)
+colPerc(table1)
+```
+  
+The numerical summary states that the vast majority of the guys were ok and uninfected. Of those that were, 58.16% had received the drug while 41.84% had received the placebo. 
+  
+# Inferential Results
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+Guymod <- fisher.test(table1)
+guyeff <- (Guymod$estimate/(Guymod$estimate+1))*100
+Guyeffupper <- Guymod$conf.int[2]
+Guyeffuppereff <- (Guymod$conf.int[2]/(Guymod$conf.int[2]+1))*100
+Guyefflower <- Guymod$conf.int[1]
+Guyefflowereff <- (Guymod$conf.int[1]/(Guymod$conf.int[1]+1))*100
+options(digits=3)
+```
+  
+
+  The chi square test shown above demonstrates a sizable difference in the expected counts by the null and the actual results in the data. Not only this, it has a small p-value below 0.05 which is the probability under our null hypothesis conditions that there is no significant difference between receiving the placebo and the treatment. The Fisher test similarly had a small p-value like the chi square test and as a result, we can assert that the drug taken has a significant effect on the likelihood of guys becoming infected with COVID or not. The Fisher test calculated that the odds of acquiring COVID when taking the drug is `r Guymod$estimate` times more likely than if not. This is based in a 95% confidence interval ranging from 1.1767 to 1.8497. We can reject our null hypothesis according to the tests above. The efficacy of the drug for the guys is `r guyeff`% with a 95% confidence interval of `r Guyefflowereff` to `r Guyeffuppereff`. As is evident by these values, the chance of men getting COVID increases when taking the drug, and as such, I am not recommending this treatment for guys.
+
   
 # Gals
 
