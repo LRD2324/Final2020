@@ -107,7 +107,46 @@ Our alternative hypothesis is that there is a tangible difference in the probabi
   
 # LGBTQ
 
-# Drug Users
+```{r}
+LGBTQ <- filter(FinalData, LGBTQ=="gay")
+```
 
+# Graphical Results
+```{r}
+barchartGC(~infected + treatment,data=LGBTQ)
+barchartGC(~infected + treatment,data=LGBTQ, type="percent")
+```
+  
+The frequency bar chart compares the frequency of the LGBTQ population who contracted COVID-19 and are ok. A overwhelmming majority of the population are ok with a small portion becoming infected. Our percent bar chart shows that of those who were infected, around 75% had received the treatment with the other 25% getting the placebo. Something is fishy! Our graphical results indicate a bias to the data.
+   
+# Numerical Results
+```{r}
+table1 <- xtabs(~infected + treatment, data=LGBTQ)
+rowPerc(table1)
+colPerc(table1)
+```
+  
+  The table at the bottom represents the percentage of the LGBTQ population who were ok and infected total. So 92.03% of those who received the drug were fine while 96.64% of those who received the placebo were OK. The top table represents what percentage of the infected population had taken the rug or the placebo. Our "OK" population was equally composed of those who had taken and did not take the drug. However, of the infected population, 70.7% had received the drug (a large correlation). This fits our graphical results.
+   
+# Inferential Results
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+LGBTQmod <- fisher.test(table1)
+LGBTQeff <- (LGBTQmod$estimate/(LGBTQmod$estimate+1))*100
+LGBTQeffupper <- LGBTQmod$conf.int[2]
+LGBTQeffuppereff <- (LGBTQmod$conf.int[2]/(LGBTQmod$conf.int[2]+1))*100
+LGBTQefflower <- LGBTQmod$conf.int[1]
+LGBTQefflowereff <- (LGBTQmod$conf.int[1]/(LGBTQmod$conf.int[1]+1))*100
+options(digits=3)
+```
+  
+Our Chi-Squared test displayed a large variation between the expected counts by the null hypothesis and our actual counts. The varying values can be seen above. Our null hypothesis is that the treatment has no significant effect on the likelihood of becoming infected with COVID-19. Our p-values are significantly low for both the Chi-squared test and the fisher exact test (1e-05 and 6e-06). This is lower than our probability under the null hypothesis of 0.05. The Fisher test calculated the odds ratio of LGBTQ people getting infected with COVID when taking the treatment to be `r LGBTQmod$estimate` to 1. Based on our data, LGBTQ people are `r LGBTQmod$estimate` times more likely to become infected if they receive treatment. As is evident by our calculations, the null hypothesis can be reject, and it can be asserted that the drug COVID91 has a significant negative effect on the probability of getting COVID-19. The efficacy of the drug when taken by LGBTQ people is `r LGBTQeff`%, with a 95% confidence interval of `r LGBTQefflowereff` to `r LGBTQeffuppereff`. The drug would have a negative impact on this population, and based on our p0values, efficacy, and odds ratio, I would not recommend this drug to be taken by LGBTQ citizens.
+  
+   
+# Drug Users
+  
+  
 # Discussion/Conclusion
 
