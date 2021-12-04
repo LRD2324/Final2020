@@ -63,7 +63,7 @@ options(digits=3)
 ```
   
 
-  The chi square test shown above demonstrates a sizable difference in the expected counts by the null and the actual results in the data. Not only this, it has a small p-value below 0.05 which is the probability under our null hypothesis conditions that there is no significant difference between receiving the placebo and the treatment. The Fisher test similarly had a small p-value like the chi square test and as a result, we can assert that the drug taken has a significant effect on the likelihood of guys becoming infected with COVID or not. The Fisher test calculated that the odds of acquiring COVID when taking the drug is `r Guymod$estimate` times more likely than if not. This is based in a 95% confidence interval ranging from 1.1767 to 1.8497. We can reject our null hypothesis according to the tests above. The efficacy of the drug for the guys is `r guyeff`% with a 95% confidence interval of `r Guyefflowereff` to `r Guyeffuppereff`. As is evident by these values, the chance of men getting COVID increases when taking the drug, and as such, I am not recommending this treatment for guys.
+  The chi square test shown above demonstrates a sizable difference in the expected counts by the null and the actual results in the data. Not only this, it has a small p-value below 0.05 which is the probability under our null hypothesis conditions that there is no significant difference between receiving the placebo and the treatment. The Fisher test similarly had a small p-value like the chi square test and as a result, we can assert that the drug taken has a significant effect on the likelihood of guys becoming infected with COVID or not. The Fisher test calculated that the odds of acquiring COVID when taking the drug is `r Guymod$estimate` times more likely than if not. Our odds ratio can be seen above at 1.473:1. This is based in a 95% confidence interval ranging from 1.1767 to 1.8497. We can reject our null hypothesis according to the tests above. The efficacy of the drug for the guys is `r guyeff`% with a 95% confidence interval of `r Guyefflowereff` to `r Guyeffuppereff`. As is evident by these values, the chance of men getting COVID increases when taking the drug, and as such, I am not recommending this treatment for guys.
 
   
 # Gals
@@ -142,11 +142,47 @@ LGBTQefflowereff <- (LGBTQmod$conf.int[1]/(LGBTQmod$conf.int[1]+1))*100
 options(digits=3)
 ```
   
-Our Chi-Squared test displayed a large variation between the expected counts by the null hypothesis and our actual counts. The varying values can be seen above. Our null hypothesis is that the treatment has no significant effect on the likelihood of becoming infected with COVID-19. Our p-values are significantly low for both the Chi-squared test and the fisher exact test (1e-05 and 6e-06). This is lower than our probability under the null hypothesis of 0.05. The Fisher test calculated the odds ratio of LGBTQ people getting infected with COVID when taking the treatment to be `r LGBTQmod$estimate` to 1. Based on our data, LGBTQ people are `r LGBTQmod$estimate` times more likely to become infected if they receive treatment. As is evident by our calculations, the null hypothesis can be reject, and it can be asserted that the drug COVID91 has a significant negative effect on the probability of getting COVID-19. The efficacy of the drug when taken by LGBTQ people is `r LGBTQeff`%, with a 95% confidence interval of `r LGBTQefflowereff` to `r LGBTQeffuppereff`. The drug would have a negative impact on this population, and based on our p0values, efficacy, and odds ratio, I would not recommend this drug to be taken by LGBTQ citizens.
+Our Chi-Squared test displayed a large variation between the expected counts by the null hypothesis and our actual counts. The varying values can be seen above. Our null hypothesis is that the treatment has no significant effect on the likelihood of becoming infected with COVID-19. Our p-values are significantly low for both the Chi-squared test and the fisher exact test (1e-05 and 6e-06). This is lower than our probability under the null hypothesis of 0.05. The Fisher test calculated the odds ratio of LGBTQ people getting infected with COVID when taking the treatment to be 2.49 to 1. Based on our data, LGBTQ people are `r LGBTQmod$estimate` times more likely to become infected if they receive treatment. As is evident by our calculations, the null hypothesis can be reject, and it can be asserted that the drug COVID91 has a significant negative effect on the probability of getting COVID-19. The efficacy of the drug when taken by LGBTQ people is `r LGBTQeff`%, with a 95% confidence interval of `r LGBTQefflowereff` to `r LGBTQeffuppereff`. The drug would have a negative impact on this population, and based on our p0values, efficacy, and odds ratio, I would not recommend this drug to be taken by LGBTQ citizens.
   
    
 # Drug Users
   
+```{r}
+DrugUsers <- filter(FinalData, DrugUser=="yes")
+```
+
+# Graphical Results
+```{r}
+barchartGC(~infected + treatment,data=DrugUsers)
+barchartGC(~infected + treatment,data=DrugUsers, type="percent")
+```
+  
+The frequency bar chart above shows that out of thousands of people who received the treatment and placebo, less than 200 total became infected. However, there seems to be more infected people when they received the placebo as opposed to the drug. In our percent bar chart, around 35% of the drug users who became infected had been given the drug, while a whopping 70% had been given the placebo. This indicates a statistical bias which can be possibly derived from having received the treatment.
+  
+# Numerical Results
+```{r}
+table1 <- xtabs(~infected + treatment, data=DrugUsers)
+rowPerc(table1)
+colPerc(table1)
+```
+  
+The bottom portion of our tables shows that 3.63% of the population who had been given the drug got COVID-19 while 6.46% of the population who had been given the placebo got COVID. Of those who had become infected, 66.7% of them were given the placebo. Similarly to our graphical results, the numerical results indicate a correlation between contraction of the virus, and ingestion of the drug.
+  
+# Inferential Results
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+DrugUsersmod <- fisher.test(table1)
+DrugUserseff <- (DrugUsersmod$estimate/(DrugUsersmod$estimate+1))*100
+DrugUserseffupper <- DrugUsersmod$conf.int[2]
+DrugUserseffuppereff <- (DrugUsersmod$conf.int[2]/(DrugUsersmod$conf.int[2]+1))*100
+DrugUsersefflower <- DrugUsersmod$conf.int[1]
+DrugUsersefflowereff <- (DrugUsersmod$conf.int[1]/(DrugUsersmod$conf.int[1]+1))*100
+options(digits=3)
+```
+  
+The Peason Chi Squared test at the top has a p-value of 0.003 which is relatively smaller than 0.05. Our counts expected by the null and observed counts vary slightly form each other, but they vary less exaggeratedly than the LGBTQ counts. Our Fisher exact test has a p-value of 0.002, which is also relatively smaller than 0.05. As a result, we can effectively claim the null hypothesis to be false, an that the intake of our drug has a significant effect on the chances of drug users becoming ill with COVID-19. Our odds ratio was 0.546:1, meaning that Drug Users were `r DrugUsersmod$estimate` times less likely to get COVID-19 because they received the study drug. Our tests and results prove that Drug Users are less likely to become COVID positive if they receive the treatment. The efficacy of the drug for the Drug Users is `r DrugUserseff`% with a 95% confidence interval of `r DrugUsersefflowereff` to `r DrugUserseffuppereff`. Taking all of our data and results into account, I would recommend this droog to any Drug Users because it has a positive effect on their likelihood of not contracting COVID.
   
 # Discussion/Conclusion
 
